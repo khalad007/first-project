@@ -7,7 +7,7 @@ const createStudent = async (req: Request, res: Response) => {
 
   try {
     const zodParsedData = StudentValidationSchema.parse(studentData)
-    
+
     const result = await StudentServices.createStudentIntoDB(zodParsedData);
     res.status(200).json({
       success: true,
@@ -42,8 +42,13 @@ const getSingleStudents = async (req: Request, res: Response) => {
       message: "Single Student data are retrive successfully...",
       data: result,
     });
-  } catch (error) {
-    console.log(error);
+  } catch (err: any) {
+    // console.log(error);
+    res.status(500).json({
+      success: false,
+      message: err.message || 'something went wrong',
+      error: err,
+    })
   }
 };
 export const StudentControllers = {
