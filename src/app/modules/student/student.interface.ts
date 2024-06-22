@@ -39,12 +39,19 @@ export type TStudent = {
   isActive: "active" | "blocked";
 };
 
-export type StudentMethods = {
+// for creating statci
+export interface StudentModel extends Model<TStudent> {
   isUserExits(id: string): Promise<TStudent | null>;
-};
+}
 
-export type StudentModel = Model<
-  TStudent,
-  Record<string, never>,
-  StudentMethods
->;
+// for creatign instance
+
+// export type StudentMethods = {
+//   isUserExits(id: string): Promise<TStudent | null>;
+// };
+
+// export type StudentModel = Model<
+//   TStudent,
+//   Record<string, never>,
+//   StudentMethods
+// >;
