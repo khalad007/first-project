@@ -136,6 +136,15 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     default: "active",
   },
 });
+
+// pre save middlewear / hook
+studentSchema.pre("save", function () {
+  console.log(this, "Pre hook : we will save our data");
+});
+// pre saved middlewear / hook
+studentSchema.post("save", function () {
+  console.log(this, "post hook: we saved our data ");
+});
 //create a custom static method
 studentSchema.statics.isUserExits = async function (id: string) {
   const existingUser = await Student.findOne({ id });
