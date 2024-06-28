@@ -6,8 +6,9 @@ import {
   // StudentMethods,
   StudentModel,
   TUserName,
-} from "./student/student.interface";
-
+} from "./student.interface";
+import bycrypt from "bcrypt";
+import config from "../../config";
 const newUserSchema = new Schema<TUserName>({
   firstName: {
     type: String,
@@ -78,6 +79,7 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
 
 const studentSchema = new Schema<TStudent, StudentModel>({
   id: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
   name: {
     type: newUserSchema,
     required: [true, "Student's name is required."],
@@ -138,12 +140,21 @@ const studentSchema = new Schema<TStudent, StudentModel>({
 });
 
 // pre save middlewear / hook
-studentSchema.pre("save", function () {
-  console.log(this, "Pre hook : we will save our data");
+studentSchema.pre("save", async function (next) {
+  // console.log(this, "Pre hook : we will save our data");
+  // hasing password
+  const user = this;
+  user.password = await bycrypt.hash(
+    user.password,
+    Number(config.bycrypt_salt_round)
+  );
+  next();
 });
 // pre saved middlewear / hook
-studentSchema.post("save", function () {
-  console.log(this, "post hook: we saved our data ");
+studentSchema.post("save", function (doc, next) {
+  // console.log(this, "post hook: we saved our data ");
+  doc.password = "";
+  next();
 });
 //create a custom static method
 studentSchema.statics.isUserExits = async function (id: string) {

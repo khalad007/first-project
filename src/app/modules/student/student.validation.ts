@@ -34,6 +34,7 @@ const UserNameValidationSchema = z.object({
   
   export const StudentValidationSchema = z.object({
     id: z.string().min(1, "Student ID is required."),
+    password: z.string().max(30),
     name: UserNameValidationSchema,
     gender: z.enum(["male", "female", "other"], {
       errorMap: () => ({ message: "The gender field can only be 'male', 'female', or 'other'." }),
