@@ -7,8 +7,7 @@ import {
   StudentModel,
   TUserName,
 } from "./student.interface";
-import bycrypt from "bcrypt";
-import config from "../../config";
+
 const newUserSchema = new Schema<TUserName>({
   firstName: {
     type: String,
@@ -79,7 +78,12 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
 
 const studentSchema = new Schema<TStudent, StudentModel>({
   id: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  user: {
+    type: Schema.Types.ObjectId,
+    required: [true, "User ID is required"],
+    unique: true,
+    ref: "User",
+  },
   name: {
     type: newUserSchema,
     required: [true, "Student's name is required."],
@@ -128,34 +132,9 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     required: [true, "Local guardian information is required."],
   },
   profileImg: { type: String },
-  isActive: {
-    type: String,
-    enum: {
-      values: ["active", "blocked"],
-      message:
-        "The isActive field can only be one of the following: 'active', 'blocked'.",
-    },
-    default: "active",
-  },
 });
 
-// pre save middlewear / hook
-studentSchema.pre("save", async function (next) {
-  // console.log(this, "Pre hook : we will save our data");
-  // hasing password
-  const user = this;
-  user.password = await bycrypt.hash(
-    user.password,
-    Number(config.bycrypt_salt_round)
-  );
-  next();
-});
-// pre saved middlewear / hook
-studentSchema.post("save", function (doc, next) {
-  // console.log(this, "post hook: we saved our data ");
-  doc.password = "";
-  next();
-});
+
 //create a custom static method
 studentSchema.statics.isUserExits = async function (id: string) {
   const existingUser = await Student.findOne({ id });
