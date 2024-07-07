@@ -1,7 +1,19 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import { StudentServices } from "./student.service";
 
-const getAllStudents = async (req: Request, res: Response, next: NextFunction) => {
+const catchAsync = (fn: RequestHandler) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch((err) => next(err));
+  };
+};
+
+
+
+const getAllStudents = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const result = await StudentServices.getAllStudentFromDB();
     res.status(200).json({
@@ -10,11 +22,15 @@ const getAllStudents = async (req: Request, res: Response, next: NextFunction) =
       data: result,
     });
   } catch (err) {
-    next(err)
+    next(err);
   }
 };
 
-const getSingleStudents = async (req: Request, res: Response, next: NextFunction) => {
+const getSingleStudents = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { studentId } = req.params;
     const result = await StudentServices.getSingleStudentFromDB(studentId);
@@ -25,7 +41,7 @@ const getSingleStudents = async (req: Request, res: Response, next: NextFunction
       data: result,
     });
   } catch (err) {
-    next(err)
+    next(err);
   }
 };
 export const StudentControllers = {
